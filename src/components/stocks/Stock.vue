@@ -13,14 +13,14 @@
             <div class="level-item">
               <div class="field">
                 <p class="control">
-                  <input type="number" class="input" placeholder="Quantity" v-model="quantity">
+                  <input type="number" class="input" placeholder="Quantity" v-model="quantity" :class="{ 'is-danger': insufficientFunds }">
                 </p>
               </div>
             </div>
           </div>
           <div class="level-right">
             <div class="level-item">
-              <button class="button is-primary" @click="buyStock" :disabled="quantity <= 0">Buy</button>
+              <button class="button is-primary" @click="buyStock" :disabled=" insufficientFunds || quantity <= 0">{{ insufficientFunds ? 'Insufficient Funds' : 'Buy' }}</button>
             </div>
           </div>
         </div>
@@ -37,6 +37,14 @@
     data() {
       return {
         quantity: 0
+      }
+    },
+    computed: {
+      funds () {
+        return this.$store.getters.funds
+      },
+      insufficientFunds () {
+        return this.quantity * this.stock.price > this.funds
       }
     },
     methods: {

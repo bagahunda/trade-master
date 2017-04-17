@@ -13,14 +13,14 @@
             <div class="level-item">
               <div class="field">
                 <p class="control">
-                  <input type="number" class="input" placeholder="Quantity" v-model="quantity">
+                  <input type="number" class="input" placeholder="Quantity" v-model="quantity" :class="{'is-danger': insufficientQuantity}">
                 </p>
               </div>
             </div>
           </div>
           <div class="level-right">
             <div class="level-item">
-              <button class="button is-primary" @click="sellStock" :disabled="quantity <= 0">Sell</button>
+              <button class="button is-primary" @click="sellStock" :disabled="insufficientQuantity || quantity <= 0">{{ insufficientQuantity ? 'Not Enough Stocks' : 'Sell' }}</button>
             </div>
           </div>
         </div>
@@ -41,6 +41,11 @@
         quantity: 0
       }
     },
+    computed: {
+      insufficientQuantity () {
+        return this.quantity > this.stock.quantity
+      }
+    },
     methods: {
       ...mapActions({
         placeSellOrder: 'sellStock'
@@ -49,7 +54,7 @@
         const order = {
           stockId: this.stock.id,
           stockPrice: this.stock.price,
-          quantity: this.stock.quantity
+          quantity: this.quantity
         }
         this.placeSellOrder(order)
         this.quantity = 0

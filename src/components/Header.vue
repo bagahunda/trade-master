@@ -7,8 +7,13 @@
         <router-link class="nav-item is-tab" activeClass="is-active" to="/stocks">Stocks</router-link>
       </div>
       <div class="nav-right nav-menu">
-        <a href="#" class="nav-item is-tab">End Day</a>
-        <div class="has-dropdown">
+        <p class="nav-item">
+          <strong>
+            Funds: {{ funds | currency }}
+          </strong>
+        </p>
+        <a href="#" class="nav-item is-tab" @click="endDay">End Day</a>
+        <div class="has-dropdown" :class="{'is-open': isDropdownOpen}" @click="isDropdownOpen = !isDropdownOpen">
           <a href="#" class="button">
             <span>Save & Load</span>
             <span class="icon is-small">
@@ -17,10 +22,10 @@
           </a>
           <ul class="dropdown box">
             <li>
-              <a href="#">Save Data</a>
+              <a href="#" @click="saveData">Save Data</a>
             </li>
             <li>
-              <a href="#">Load Data</a>
+              <a href="#" @click="loadData">Load Data</a>
             </li>
           </ul>
         </div>
@@ -28,6 +33,43 @@
     </div>
   </nav>
 </template>
+
+<script>
+  import { mapActions } from 'vuex'
+  export default {
+    data () {
+      return {
+        isDropdownOpen: false
+      }
+    },
+    computed: {
+      funds () {
+        return this.$store.getters.funds
+      }
+    },
+    methods: {
+      ...mapActions({
+        randomizeStock: 'randomizeStock',
+        fetchData: 'loadData'
+      }),
+      endDay () {
+        this.randomizeStock()
+      },
+      saveData () {
+        const data = {
+          funds: this.$store.getters.funds,
+          stockPortfolio: this.$store.getters.stockPortfolio,
+          stocks: this.$store.getters.stocks
+        }
+        this.$http.put('data.json', data)
+      },
+      loadData () {
+        this.fetchData()
+      }
+    }
+  }
+
+</script>
 
 <style>
 
@@ -48,7 +90,14 @@
   }
 
   .dropdown {
+    position: absolute;
+    top: 84%;
+    left: 0;
     display: none;
+  }
+
+  .is-open .dropdown {
+    display: inline-block;
   }
 
 </style>
